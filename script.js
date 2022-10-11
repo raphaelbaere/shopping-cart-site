@@ -101,7 +101,7 @@ const createItems = async () => {
 
 const getSavedItemsAndShow = () => {
   const cartItemsContainer = document.querySelector('.cart__items');
-  const cartItems = JSON.parse(localStorage.getItem('cartItems'));
+  const cartItems = getSavedCartItems();
   if (cartItems.length > 0) {
   cartItems.forEach((item) => {
     cartItemsContainer.appendChild(createCartItemElement(item));
@@ -111,7 +111,7 @@ const getSavedItemsAndShow = () => {
 
 window.onload = () => { 
   createItems();
-  if (JSON.parse(localStorage.getItem('cartItems'))) {
+  if (getSavedCartItems()) {
     getSavedItemsAndShow();
   }
 };
