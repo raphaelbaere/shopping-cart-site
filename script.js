@@ -2,7 +2,6 @@
 // experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições! 
 
 // Fique a vontade para modificar o código já escrito e criar suas próprias funções!
-const itemsContainer = document.querySelector('.items');
 /**
  * Função responsável por criar e retornar o elemento de imagem do produto.
  * @param {string} imageSource - URL da imagem.
@@ -14,7 +13,6 @@ const createProductImageElement = (imageSource) => {
   img.src = imageSource;
   return img;
 };
-
 /**
  * Função responsável por criar e retornar qualquer elemento.
  * @param {string} element - Nome do elemento a ser criado.
@@ -22,10 +20,26 @@ const createProductImageElement = (imageSource) => {
  * @param {string} innerText - Texto do elemento.
  * @returns {Element} Elemento criado.
  */
+
+ const createCartItemElement = ({ id, title, price }) => {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
+  li.addEventListener('click', () => {});
+  return li;
+};
+
 const createCustomElement = (element, className, innerText) => {
+  const cartItemsContainer = document.querySelector('.cart__items');
   const e = document.createElement(element);
   e.className = className;
   e.innerText = innerText;
+  if (element === 'button') {
+    e.addEventListener('click', async (event) => {
+        const objetoDoProduto = await fetchItem(event.path[1].firstChild.innerHTML);
+        cartItemsContainer.appendChild(createCartItemElement(objetoDoProduto));
+    });
+  }
   return e;
 };
 
@@ -66,15 +80,9 @@ const getIdFromProductItem = (product) => product.querySelector('span.id').inner
  * @returns {Element} Elemento de um item do carrinho.
  */
 // eslint-disable-next-line no-unused-vars
-const createCartItemElement = ({ id, title, price }) => {
-  const li = document.createElement('li');
-  li.className = 'cart__item';
-  li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
-  li.addEventListener('click', cartItemClickListener);
-  return li;
-};
 
 const createItems = async () => {
+  const itemsContainer = document.querySelector('.items');
   const objetoRetornado = await fetchProducts('computador');
   const { results: products } = objetoRetornado;
   products.forEach((product) => {
