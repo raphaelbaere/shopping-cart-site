@@ -21,11 +21,16 @@ const createProductImageElement = (imageSource) => {
  * @returns {Element} Elemento criado.
  */
 
+ const removeChild = (event) => {
+  const cartItemsContainer = document.querySelector('.cart__items');
+  cartItemsContainer.removeChild(event.path[0]);
+ };
+
  const createCartItemElement = ({ id, title, price }) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
-  li.addEventListener('click', () => {});
+  li.addEventListener('click', removeChild);
   return li;
 };
 
