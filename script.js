@@ -54,6 +54,7 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
  * @param {Element} product - Elemento do produto.
  * @returns {string} ID do produto.
  */
+// eslint-disable-next-line no-unused-vars
 const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
 
 /**
@@ -64,6 +65,7 @@ const getIdFromProductItem = (product) => product.querySelector('span.id').inner
  * @param {string} product.price - Preço do produto.
  * @returns {Element} Elemento de um item do carrinho.
  */
+// eslint-disable-next-line no-unused-vars
 const createCartItemElement = ({ id, title, price }) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
@@ -75,7 +77,6 @@ const createCartItemElement = ({ id, title, price }) => {
 const createItems = async () => {
   const objetoRetornado = await fetchProducts('computador');
   const { results: products } = objetoRetornado;
-  console.log(products);
   products.forEach((product) => {
     itemsContainer.appendChild(createProductItemElement(product));
   });
