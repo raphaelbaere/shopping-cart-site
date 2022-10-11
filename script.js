@@ -20,12 +20,28 @@ const createProductImageElement = (imageSource) => {
  * @param {string} innerText - Texto do elemento.
  * @returns {Element} Elemento criado.
  */
+ const cartItemsLiteral = '.cart__items';
 
-const cartItemsLiteral = '.cart__items';
+ const calculateTotalPrice = (cartItems) => cartItems.reduce((acc, curr) => acc + curr.price, 0);
+
+ const createTotalPrice = (totalPrice) => {
+   const cartItemsContainer = document.querySelector(cartItemsLiteral);
+   const p = document.querySelector('.total-price');
+   p.innerHTML = `${Math.round(totalPrice)}`;
+   cartItemsContainer.appendChild(p);
+ };
 
  const removeChild = (event) => {
   const cartItemsContainer = document.querySelector(cartItemsLiteral);
+  const productId = event.path[0].innerHTML.split('').slice(4, 17).join('');
+  const totalPrice = calculateTotalPrice(getSavedCartItems());
+  createTotalPrice(totalPrice);
   cartItemsContainer.removeChild(event.path[0]);
+  if (getSavedCartItems()) {
+    const cartItems = getSavedCartItems();
+    const removedItemArray = cartItems.filter((item) => item.id !== productId);
+    localStorage.setItem('cartItems', JSON.stringify(removedItemArray));
+  }
  };
 
  const createCartItemElement = ({ id, title, price }) => {
@@ -34,15 +50,6 @@ const cartItemsLiteral = '.cart__items';
   li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   li.addEventListener('click', removeChild);
   return li;
-};
-
-const calculateTotalPrice = (cartItems) => cartItems.reduce((acc, curr) => acc + curr.price, 0);
-
-const createTotalPrice = (totalPrice) => {
-  const cartItemsContainer = document.querySelector(cartItemsLiteral);
-  const p = document.querySelector('.total-price');
-  p.innerHTML = `${Math.round(totalPrice)}`;
-  cartItemsContainer.appendChild(p);
 };
 
 const createCustomElement = (element, className, innerText) => {
@@ -119,6 +126,13 @@ const getSavedItemsAndShow = () => {
     });
   }
 };
+
+const emptyCartButton = document.querySelector('.empty-cart');
+emptyCartButton.addEventListener('click', () => {
+  const cartItemsContainer = document.querySelector(cartItemsLiteral);
+  cartItemsContainer.innerHTML = '';
+  localStorage.clear();
+});
 
 window.onload = () => { 
   createItems();
