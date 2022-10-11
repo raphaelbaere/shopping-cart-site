@@ -4,7 +4,7 @@ const createUrl = (name) => {
 };
 
 const validUrl = (name) => {
-    if (name) {
+    if (name === 'computador') {
       return true;
   }
   throw new Error('You must provide an url');
