@@ -21,8 +21,10 @@ const createProductImageElement = (imageSource) => {
  * @returns {Element} Elemento criado.
  */
 
+const cartItemsLiteral = '.cart__items';
+
  const removeChild = (event) => {
-  const cartItemsContainer = document.querySelector('.cart__items');
+  const cartItemsContainer = document.querySelector(cartItemsLiteral);
   cartItemsContainer.removeChild(event.path[0]);
  };
 
@@ -35,7 +37,7 @@ const createProductImageElement = (imageSource) => {
 };
 
 const createCustomElement = (element, className, innerText) => {
-  const cartItemsContainer = document.querySelector('.cart__items');
+  const cartItemsContainer = document.querySelector(cartItemsLiteral);
   const e = document.createElement(element);
   e.className = className;
   e.innerText = innerText;
@@ -43,6 +45,8 @@ const createCustomElement = (element, className, innerText) => {
     e.addEventListener('click', async (event) => {
         const objetoDoProduto = await fetchItem(event.path[1].firstChild.innerHTML);
         cartItemsContainer.appendChild(createCartItemElement(objetoDoProduto));
+        const { id, title, price } = objetoDoProduto;
+        saveCartItems({ id, title, price });
     });
   }
   return e;
@@ -95,6 +99,19 @@ const createItems = async () => {
   });
 };
 
+const getSavedItemsAndShow = () => {
+  const cartItemsContainer = document.querySelector('.cart__items');
+  const cartItems = JSON.parse(localStorage.getItem('cartItems'));
+  if (cartItems.length > 0) {
+  cartItems.forEach((item) => {
+    cartItemsContainer.appendChild(createCartItemElement(item));
+    });
+  }
+};
+
 window.onload = () => { 
   createItems();
+  if (JSON.parse(localStorage.getItem('cartItems'))) {
+    getSavedItemsAndShow();
+  }
 };
