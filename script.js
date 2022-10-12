@@ -24,7 +24,14 @@ const createProductImageElement = (imageSource) => {
 
  const removeChild = (event) => {
   const cartItemsContainer = document.querySelector(cartItemsLiteral);
+  const productId = event.path[0].innerHTML.split('').slice(4, 17).join('');
   cartItemsContainer.removeChild(event.path[0]);
+  if (getSavedCartItems()) {
+    const cartItems = getSavedCartItems();
+    const indexOfItem = cartItems.findIndex((item) => item === productId);
+    const removedItemArray = cartItems.splice(indexOfItem, 0);
+    localStorage.setItem('cartItems', JSON.stringify(removedItemArray));
+  }
  };
 
  const createCartItemElement = ({ id, title, price }) => {
@@ -45,7 +52,7 @@ const createCustomElement = (element, className, innerText) => {
         const objetoDoProduto = await fetchItem(event.path[1].firstChild.innerHTML);
         cartItemsContainer.appendChild(createCartItemElement(objetoDoProduto));
         const { id } = objetoDoProduto;
-        saveCartItems(id);
+        saveCartItems({ id });
     });
   }
   return e;
