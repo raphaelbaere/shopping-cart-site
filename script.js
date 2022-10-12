@@ -1,5 +1,5 @@
 // Esse tipo de comentário que estão antes de todas as funções são chamados de JSdoc,
-// experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições! 
+// experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições!
 
 // Fique a vontade para modificar o código já escrito e criar suas próprias funções!
 /**
@@ -25,6 +25,7 @@ const createProductImageElement = (imageSource) => {
   img.src = imageSource;
   return img;
 };
+const arrayObjectCartAPIMaker = (array) => array.reduce((acc, curr) => acc + curr.price, 0);
 /**
  * Função responsável por criar e retornar qualquer elemento.
  * @param {string} element - Nome do elemento a ser criado.
@@ -35,7 +36,14 @@ const createProductImageElement = (imageSource) => {
  const cartItemsLiteral = '.cart__items';
 
  const removeChild = (event) => {
+  const p = document.querySelector('.total-price');
   const cartItemsContainer = document.querySelector(cartItemsLiteral);
+  const productId = event.target.textContent.slice(4, 17);
+  const cartItemArray = getSavedCartItems();
+  const cartItemArrayFiltered = cartItemArray.filter((item) => item.id !== productId);
+  localStorage.setItem('cartItems', JSON.stringify(cartItemArrayFiltered));
+  p.innerHTML = arrayObjectCartAPIMaker(getSavedCartItems())
+  .toString().match(/^\d+(?:\.\d{0,2})?/);
   cartItemsContainer.removeChild(event.path[0]);
  };
 
@@ -46,8 +54,6 @@ const createProductImageElement = (imageSource) => {
   li.addEventListener('click', removeChild);
   return li;
 };
-
-const arrayObjectCartAPIMaker = (array) => array.reduce((acc, curr) => acc + curr.price, 0);
 const cartItemsContainer = document.querySelector(cartItemsLiteral);
 
 const validSave = (objeto) => {
@@ -56,10 +62,12 @@ const validSave = (objeto) => {
     const cartItems = getSavedCartItems();
     cartItems.push(objeto);
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    p.innerHTML = arrayObjectCartAPIMaker(getSavedCartItems());
+    p.innerHTML = arrayObjectCartAPIMaker(getSavedCartItems())
+    .toString().match(/^\d+(?:\.\d{0,2})?/);
     } else {
       saveCartItems(objeto); 
-      p.innerHTML = arrayObjectCartAPIMaker(getSavedCartItems());
+      p.innerHTML = arrayObjectCartAPIMaker(getSavedCartItems())
+      .toString().match(/^\d+(?:\.\d{0,2})?/);
     }
 };
 
@@ -147,6 +155,5 @@ window.onload = async () => {
   createItems();
   if (getSavedCartItems()) {
     getSavedItemsAndShow();
-    console.log(arrayObjectCartAPIMaker(getSavedCartItems()));
   }
 };
