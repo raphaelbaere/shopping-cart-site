@@ -38,7 +38,7 @@ const arrayObjectCartAPIMaker = (array) => array.reduce((acc, curr) => acc + cur
  const removeChild = (event) => {
   const p = document.querySelector('.total-price');
   const cartItemsContainer = document.querySelector(cartItemsLiteral);
-  const productId = event.target.textContent.slice(4, 17);
+  const productId = event.target.textContent.split('').splice(4, 13).join('');
   const cartItemArray = getSavedCartItems();
   const cartItemArrayFiltered = cartItemArray.filter((item) => item.id !== productId);
   localStorage.setItem('cartItems', JSON.stringify(cartItemArrayFiltered));

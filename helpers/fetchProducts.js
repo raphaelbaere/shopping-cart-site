@@ -17,8 +17,8 @@ const fetchProducts = async (name) => {
     const response = await fetch(url);
     const objetoRetornado = await response.json(); 
     return objetoRetornado;
-  } catch (error) {
-    return error;
+  } catch (erroraa) {
+    return erroraa;
   }
 };
 
