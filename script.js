@@ -22,26 +22,9 @@ const createProductImageElement = (imageSource) => {
  */
  const cartItemsLiteral = '.cart__items';
 
- const calculateTotalPrice = (cartItems) => cartItems.reduce((acc, curr) => acc + curr.price, 0);
-
- const createTotalPrice = (totalPrice) => {
-   const cartItemsContainer = document.querySelector(cartItemsLiteral);
-   const p = document.querySelector('.total-price');
-   p.innerHTML = `${Math.round(totalPrice)}`;
-   cartItemsContainer.appendChild(p);
- };
-
  const removeChild = (event) => {
   const cartItemsContainer = document.querySelector(cartItemsLiteral);
-  const productId = event.path[0].innerHTML.split('').slice(4, 17).join('');
-  const totalPrice = calculateTotalPrice(getSavedCartItems());
-  createTotalPrice(totalPrice);
   cartItemsContainer.removeChild(event.path[0]);
-  if (getSavedCartItems()) {
-    const cartItems = getSavedCartItems();
-    const removedItemArray = cartItems.filter((item) => item.id !== productId);
-    localStorage.setItem('cartItems', JSON.stringify(removedItemArray));
-  }
  };
 
  const createCartItemElement = ({ id, title, price }) => {
@@ -61,10 +44,8 @@ const createCustomElement = (element, className, innerText) => {
     e.addEventListener('click', async (event) => {
         const objetoDoProduto = await fetchItem(event.path[1].firstChild.innerHTML);
         cartItemsContainer.appendChild(createCartItemElement(objetoDoProduto));
-        const { id, title, price } = objetoDoProduto;
-        saveCartItems({ id, title, price });
-        const totalPrice = calculateTotalPrice(getSavedCartItems());
-        createTotalPrice(totalPrice);
+        const { id } = objetoDoProduto;
+        saveCartItems(id);
     });
   }
   return e;
@@ -117,12 +98,13 @@ const createItems = async () => {
   });
 };
 
-const getSavedItemsAndShow = () => {
+const getSavedItemsAndShow = async () => {
   const cartItemsContainer = document.querySelector('.cart__items');
   const cartItems = getSavedCartItems();
   if (cartItems.length > 0) {
-  cartItems.forEach((item) => {
-    cartItemsContainer.appendChild(createCartItemElement(item));
+  cartItems.forEach(async (item) => {
+    const objRetornado = await fetchItem(item);
+    cartItemsContainer.appendChild(createCartItemElement(objRetornado));
     });
   }
 };
@@ -138,7 +120,5 @@ window.onload = () => {
   createItems();
   if (getSavedCartItems()) {
     getSavedItemsAndShow();
-    const totalPrice = calculateTotalPrice(getSavedCartItems());
-    createTotalPrice(totalPrice);
   }
 };
