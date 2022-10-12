@@ -7,6 +7,18 @@
  * @param {string} imageSource - URL da imagem.
  * @returns {Element} Elemento de imagem do produto.
  */
+
+ const removeLoadText = (parentNode, loadNode) => {
+  parentNode.removeChild(loadNode);
+};
+
+const createLoadText = () => {
+  const p = document.createElement('p');
+  p.classList.add('loading');
+  p.innerHTML = 'carregando...';
+  return p;
+};
+
 const createProductImageElement = (imageSource) => {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -24,14 +36,7 @@ const createProductImageElement = (imageSource) => {
 
  const removeChild = (event) => {
   const cartItemsContainer = document.querySelector(cartItemsLiteral);
-  const productId = event.path[0].innerHTML.split('').slice(4, 17).join('');
   cartItemsContainer.removeChild(event.path[0]);
-  if (getSavedCartItems()) {
-    const cartItems = getSavedCartItems();
-    const indexOfItem = cartItems.findIndex((item) => item === productId);
-    const removedItemArray = cartItems.splice(indexOfItem, 0);
-    localStorage.setItem('cartItems', JSON.stringify(removedItemArray));
-  }
  };
 
  const createCartItemElement = ({ id, title, price }) => {
@@ -42,8 +47,23 @@ const createProductImageElement = (imageSource) => {
   return li;
 };
 
+const arrayObjectCartAPIMaker = (array) => array.reduce((acc, curr) => acc + curr.price, 0);
+const cartItemsContainer = document.querySelector(cartItemsLiteral);
+
+const validSave = (objeto) => {
+  const p = document.querySelector('.total-price');
+  if (getSavedCartItems()) {
+    const cartItems = getSavedCartItems();
+    cartItems.push(objeto);
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    p.innerHTML = arrayObjectCartAPIMaker(getSavedCartItems());
+    } else {
+      saveCartItems(objeto); 
+      p.innerHTML = arrayObjectCartAPIMaker(getSavedCartItems());
+    }
+};
+
 const createCustomElement = (element, className, innerText) => {
-  const cartItemsContainer = document.querySelector(cartItemsLiteral);
   const e = document.createElement(element);
   e.className = className;
   e.innerText = innerText;
@@ -51,8 +71,8 @@ const createCustomElement = (element, className, innerText) => {
     e.addEventListener('click', async (event) => {
         const objetoDoProduto = await fetchItem(event.path[1].firstChild.innerHTML);
         cartItemsContainer.appendChild(createCartItemElement(objetoDoProduto));
-        const { id } = objetoDoProduto;
-        saveCartItems({ id });
+        const { id, title, price } = objetoDoProduto;
+        validSave({ id, title, price });
     });
   }
   return e;
@@ -98,34 +118,35 @@ const getIdFromProductItem = (product) => product.querySelector('span.id').inner
 
 const createItems = async () => {
   const itemsContainer = document.querySelector('.items');
+  const p = createLoadText();
+  itemsContainer.appendChild(p);
   const objetoRetornado = await fetchProducts('computador');
   const { results: products } = objetoRetornado;
+  removeLoadText(itemsContainer, p);
   products.forEach((product) => {
     itemsContainer.appendChild(createProductItemElement(product));
   });
 };
 
 const getSavedItemsAndShow = async () => {
-  const cartItemsContainer = document.querySelector('.cart__items');
   const cartItems = getSavedCartItems();
   if (cartItems.length > 0) {
-  cartItems.forEach(async (item) => {
-    const objRetornado = await fetchItem(item);
-    cartItemsContainer.appendChild(createCartItemElement(objRetornado));
+  cartItems.forEach(async (objItem) => {
+    cartItemsContainer.appendChild(createCartItemElement(objItem));
     });
   }
 };
 
 const emptyCartButton = document.querySelector('.empty-cart');
 emptyCartButton.addEventListener('click', () => {
-  const cartItemsContainer = document.querySelector(cartItemsLiteral);
   cartItemsContainer.innerHTML = '';
   localStorage.clear();
 });
 
-window.onload = () => { 
+window.onload = async () => { 
   createItems();
   if (getSavedCartItems()) {
     getSavedItemsAndShow();
+    console.log(arrayObjectCartAPIMaker(getSavedCartItems()));
   }
 };
